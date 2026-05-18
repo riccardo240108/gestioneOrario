@@ -9,3 +9,6 @@ SET t1.ore_altro = t1.ore_contratto - t2.ore;
 
 # formula usata per popolare la colonna "ore_altro" nella tabella docenti.
 # ccontare ora le ore che copre ogni prof basandosi solo sulle ore che copre per ogni materia (dovrebbe già farlo ma controlla) 
+
+
+SISTEMARE DB DA QUI, AGGIUNGERE ORE A PIANI DI STUDIO
