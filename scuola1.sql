@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Creato il: Mag 18, 2026 alle 14:15
+-- Creato il: Mag 18, 2026 alle 14:55
 -- Versione del server: 10.4.28-MariaDB
 -- Versione PHP: 8.2.4
 
@@ -107,69 +107,14 @@ CREATE TABLE `docenti` (
 
 INSERT INTO `docenti` (`id`, `cognome`, `nome`, `email`, `ore_contratto`, `tipo_contratto`, `sostituisce_id`) VALUES
 (1, 'Agostini', 'Nadia', 'agostini.nadia@liceorussell.eu', 9, 'di ruolo', NULL),
-(2, 'Andaloro', 'Stefano', 'andaloro.stefano@liceorussell.eu', 18, 'di ruolo', NULL),
+(2, 'Andaloro', 'Stefano', 'andaloro.stefano@liceorussell.eu', 9, 'di ruolo', NULL),
 (3, 'Angeli', 'Livio', 'angeli.livio@liceorussell.eu', 18, 'di ruolo', NULL),
-(4, 'Anniciello', 'Patrizia', 'anniciello.patrizia@liceorussell.eu', 18, 'di ruolo', NULL),
-(5, 'Apolloni', 'Giovanna', 'apolloni.giovanna@liceorussell.eu', 18, 'di ruolo', NULL),
-(6, 'Bandera', 'William', 'bandera.william@liceorussell.eu', 18, 'di ruolo', NULL),
-(7, 'Bernardinatti', 'Barbara', 'bernardinatti.barbara@liceorussell.eu', 18, 'di ruolo', NULL),
-(8, 'Bertolini', 'Claudia', 'bertolini.claudia@liceorussell.eu', 18, 'di ruolo', NULL),
-(9, 'Blasiol', 'Marcella', 'blasiol.marcella@liceorussell.eu', 18, 'di ruolo', NULL),
-(10, 'Brentari', 'Elena', 'brentari.elena@liceorussell.eu', 18, 'di ruolo', NULL),
-(11, 'Brugnara', 'Roberto', 'brugnara.roberto@liceorussell.eu', 18, 'di ruolo', NULL),
-(12, 'Brunetta', 'Biagio', 'brunetta.biagio@liceorussell.eu', 18, 'di ruolo', NULL),
-(13, 'Callovi', 'Pietro', 'callovi.pietro@liceorussell.eu', 18, 'di ruolo', NULL),
-(14, 'Campillo', 'Maria Cecilia', 'campillo.mariacecilia@liceorussell.eu', 10, 'di ruolo', NULL),
-(15, 'Carrara', 'Claretta', 'carrara.claretta@liceorussell.eu', 18, 'di ruolo', NULL),
-(16, 'Casagrande', 'Chiara', 'casagrande.chiara@liceorussell.eu', 18, 'di ruolo', NULL),
-(17, 'Cattani', 'Michele', 'cattani.michele@liceorussell.eu', 18, 'di ruolo', NULL),
-(18, 'Cescatti', 'Lucia', 'cescatti.lucia@liceorussell.eu', 18, 'di ruolo', NULL),
-(19, 'Chini', 'Stefania', 'chini.stefania@liceorussell.eu', 18, 'di ruolo', NULL),
-(20, 'Ciaghi', 'Cristina', 'ciaghi.cristina@liceorussell.eu', 18, 'di ruolo', NULL),
-(21, 'Colombo', 'Marco', 'colombo.marco@liceorussell.eu', 18, 'di ruolo', NULL),
-(22, 'Dalpiaz', 'Monica', 'dalpiaz.monica@liceorussell.eu', 18, 'di ruolo', NULL),
-(23, 'De Carli', 'Michele', 'decarli.michele@liceorussell.eu', 18, 'di ruolo', NULL),
-(24, 'Degiampietro', 'Marta', 'degiampietro.marta@liceorussell.eu', 18, 'di ruolo', NULL),
-(25, 'Delladio', 'Daniela', 'delladio.daniela@liceorussell.eu', 18, 'di ruolo', NULL),
-(26, 'Dorigatti', 'Cristina', 'dorigatti.cristina@liceorussell.eu', 18, 'di ruolo', NULL),
-(27, 'Eccher', 'Cristina', 'eccher.cristina@liceorussell.eu', 18, 'di ruolo', NULL),
-(28, 'Endrizzi', 'Michela', 'endrizzi.michela@liceorussell.eu', 18, 'di ruolo', NULL),
-(29, 'Fabbri', 'Claudio', 'fabbri.claudio@liceorussell.eu', 18, 'di ruolo', NULL),
-(30, 'Facchinelli', 'Cristina', 'facchinelli.cristina@liceorussell.eu', 18, 'di ruolo', NULL),
-(31, 'Fait', 'Paola', 'fait.paola@liceorussell.eu', 18, 'di ruolo', NULL),
-(32, 'Fedrizzi', 'Paola', 'fedrizzi.paola@liceorussell.eu', 18, 'di ruolo', NULL),
-(33, 'Ferrari', 'Francesca', 'ferrari.francesca@liceorussell.eu', 18, 'di ruolo', NULL),
-(34, 'Filippi', 'Silvia', 'filippi.silvia@liceorussell.eu', 18, 'di ruolo', NULL),
-(35, 'Fontana', 'Michela', 'fontana.michela@liceorussell.eu', 18, 'di ruolo', NULL),
-(36, 'Franceschini', 'Giulia', 'franceschini.giulia@liceorussell.eu', 18, 'di ruolo', NULL),
-(37, 'Gasperini', 'Cristina', 'gasperini.cristina@liceorussell.eu', 18, 'di ruolo', NULL),
-(38, 'Giovanazzi', 'Daniela', 'giovanazzi.daniela@liceorussell.eu', 18, 'di ruolo', NULL),
-(39, 'Gubert', 'Manuela', 'gubert.manuela@liceorussell.eu', 18, 'di ruolo', NULL),
-(40, 'Iob', 'Elisa', 'iob.elisa@liceorussell.eu', 18, 'di ruolo', NULL),
-(41, 'Leonardi', 'Paola', 'leonardi.paola@liceorussell.eu', 18, 'di ruolo', NULL),
-(42, 'Maestri', 'Laura', 'maestri.laura@liceorussell.eu', 18, 'di ruolo', NULL),
-(43, 'Maffeis', 'Chiara', 'maffeis.chiara@liceorussell.eu', 18, 'di ruolo', NULL),
-(44, 'Marchi', 'Cristina', 'marchi.cristina@liceorussell.eu', 18, 'di ruolo', NULL),
-(45, 'Margaritelli', 'Luca', 'margaritelli.luca@liceorussell.eu', 18, 'di ruolo', NULL),
-(46, 'Marini', 'Francesca', 'marini.francesca@liceorussell.eu', 18, 'di ruolo', NULL),
-(47, 'Martinelli', 'Francesca', 'martinelli.francesca@liceorussell.eu', 18, 'di ruolo', NULL),
-(48, 'Micheli', 'Paola', 'micheli.paola@liceorussell.eu', 18, 'di ruolo', NULL),
-(49, 'Miorandi', 'Cristina', 'miorandi.cristina@liceorussell.eu', 18, 'di ruolo', NULL),
-(50, 'Molon', 'Paola', 'molon.paola@liceorussell.eu', 18, 'di ruolo', NULL),
-(51, 'Morelli', 'Cristina', 'morelli.cristina@liceorussell.eu', 18, 'di ruolo', NULL),
-(52, 'Mosca', 'Daniela', 'mosca.daniela@liceorussell.eu', 18, 'di ruolo', NULL),
-(53, 'Nardelli', 'Elena', 'nardelli.elena@liceorussell.eu', 18, 'di ruolo', NULL),
-(54, 'Nones', 'Cristina', 'nones.cristina@liceorussell.eu', 18, 'di ruolo', NULL),
-(55, 'Pancheri', 'Paola', 'pancheri.paola@liceorussell.eu', 18, 'di ruolo', NULL),
-(56, 'Pellegrini', 'Daniela', 'pellegrini.daniela@liceorussell.eu', 18, 'di ruolo', NULL),
-(57, 'Piffer', 'Cristina', 'piffer.cristina@liceorussell.eu', 18, 'di ruolo', NULL),
-(58, 'Pisoni', 'Daniela', 'pisoni.daniela@liceorussell.eu', 18, 'di ruolo', NULL),
-(59, 'Rizzi', 'Cristina', 'rizzi.cristina@liceorussell.eu', 18, 'di ruolo', NULL),
-(60, 'Rossi', 'Paola', 'rossi.paola@liceorussell.eu', 18, 'di ruolo', NULL),
-(61, 'Sartori', 'Cristina', 'sartori.cristina@liceorussell.eu', 18, 'di ruolo', NULL),
-(62, 'Tamanini', 'Daniela', 'tamanini.daniela@liceorussell.eu', 18, 'di ruolo', NULL),
-(63, 'Tomasi', 'Cristina', 'tomasi.cristina@liceorussell.eu', 18, 'di ruolo', NULL),
-(64, 'Zanella', 'Paola', 'zanella.paola@liceorussell.eu', 18, 'di ruolo', NULL);
+(4, 'Anniciello', 'Patrizia', 'anniciello.patrizia@liceorussell.eu', 5, 'di ruolo', NULL),
+(5, 'Apolloni', 'Giovanna', 'apolloni.giovanna@liceorussell.eu', 5, 'di ruolo', NULL),
+(6, 'Bandera', 'William', 'bandera.william@liceorussell.eu', 11, 'di ruolo', NULL),
+(7, 'Bernardinatti', 'Barbara', 'bernardinatti.barbara@liceorussell.eu', 2, 'di ruolo', NULL),
+
+
 
 -- --------------------------------------------------------
 
@@ -179,18 +124,27 @@ INSERT INTO `docenti` (`id`, `cognome`, `nome`, `email`, `ore_contratto`, `tipo_
 
 CREATE TABLE `docenti_materie` (
   `docente_id` int(11) NOT NULL,
-  `nome_materia` varchar(100) NOT NULL
+  `nome_materia` varchar(100) NOT NULL,
+  `ore` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dump dei dati per la tabella `docenti_materie`
 --
 
-INSERT INTO `docenti_materie` (`docente_id`, `nome_materia`) VALUES
-(1, 'Fisica'),
-(1, 'Matematica'),
-(2, 'Lingua e letteratura italiana'),
-(3, 'Lingua e letteratura italiana');
+INSERT INTO `docenti_materie` (`docente_id`, `nome_materia`, `ore`) VALUES
+(1, 'Lingua e cultura latina', 4),
+(1, 'Lingua e letteratura italiana', 5),
+(2, 'Lingua e letteratura italiana', 14),
+(2, 'Storia e geografia', 4),
+(3, 'Lingua e cultura greca', 8),
+(3, 'Lingua e cultura latina', 5),
+(3, 'Lingua e letteratura italiana', 5),
+(4, 'Fisica', 9),
+(4, 'Matematica', 9),
+(5, 'Scienze naturali (biologia, chimica, scienze della terra)', 18),
+(6, 'Disegno e storia dell\'arte', 12),
+(6, 'Storia dell\'arte', 6);
 
 -- --------------------------------------------------------
 
