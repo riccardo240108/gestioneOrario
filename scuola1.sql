@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Creato il: Mag 18, 2026 alle 14:00
+-- Creato il: Mag 18, 2026 alle 14:15
 -- Versione del server: 10.4.28-MariaDB
 -- Versione PHP: 8.2.4
 
@@ -262,26 +262,6 @@ INSERT INTO `piani_studi` (`indirizzo`, `anno`, `codice_materia`, `ore_settimana
 ('Classico', 5, 'ITA', 4),
 ('Classico', 5, 'LAT', 4);
 
--- --------------------------------------------------------
-
---
--- Struttura della tabella `piani_studi_materie`
---
-
-CREATE TABLE `piani_studi_materie` (
-  `indirizzo` varchar(100) NOT NULL,
-  `anno` int(11) NOT NULL,
-  `nome_materia` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dump dei dati per la tabella `piani_studi_materie`
---
-
-INSERT INTO `piani_studi_materie` (`indirizzo`, `anno`, `nome_materia`) VALUES
-('Classico', 1, 'Lingua e cultura latina'),
-('Classico', 1, 'Lingua e letteratura italiana');
-
 --
 -- Indici per le tabelle scaricate
 --
@@ -327,13 +307,6 @@ ALTER TABLE `piani_studi`
   ADD PRIMARY KEY (`indirizzo`,`anno`,`codice_materia`);
 
 --
--- Indici per le tabelle `piani_studi_materie`
---
-ALTER TABLE `piani_studi_materie`
-  ADD PRIMARY KEY (`indirizzo`,`anno`,`nome_materia`),
-  ADD KEY `nome_materia` (`nome_materia`);
-
---
 -- AUTO_INCREMENT per le tabelle scaricate
 --
 
@@ -367,13 +340,6 @@ ALTER TABLE `docenti`
 ALTER TABLE `docenti_materie`
   ADD CONSTRAINT `docenti_materie_ibfk_1` FOREIGN KEY (`docente_id`) REFERENCES `docenti` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `docenti_materie_ibfk_2` FOREIGN KEY (`nome_materia`) REFERENCES `materie` (`nome_materia`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Limiti per la tabella `piani_studi_materie`
---
-ALTER TABLE `piani_studi_materie`
-  ADD CONSTRAINT `piani_studi_materie_ibfk_1` FOREIGN KEY (`indirizzo`,`anno`) REFERENCES `piani_studi` (`indirizzo`, `anno`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `piani_studi_materie_ibfk_2` FOREIGN KEY (`nome_materia`) REFERENCES `materie` (`nome_materia`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
