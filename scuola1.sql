@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Creato il: Mag 18, 2026 alle 13:46
+-- Creato il: Mag 18, 2026 alle 14:00
 -- Versione del server: 10.4.28-MariaDB
 -- Versione PHP: 8.2.4
 
@@ -20,6 +20,28 @@ SET time_zone = "+00:00";
 --
 -- Database: `scuola1`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cattedre`
+--
+
+CREATE TABLE `cattedre` (
+  `docente_id` int(11) NOT NULL,
+  `nome_classe` varchar(10) NOT NULL,
+  `nome_materia` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dump dei dati per la tabella `cattedre`
+--
+
+INSERT INTO `cattedre` (`docente_id`, `nome_classe`, `nome_materia`) VALUES
+(1, '1A', 'Fisica'),
+(1, '1A', 'Matematica'),
+(1, '1B', 'Matematica'),
+(2, '1A', 'Lingua e letteratura italiana');
 
 -- --------------------------------------------------------
 
@@ -152,6 +174,27 @@ INSERT INTO `docenti` (`id`, `cognome`, `nome`, `email`, `ore_contratto`, `tipo_
 -- --------------------------------------------------------
 
 --
+-- Struttura della tabella `docenti_materie`
+--
+
+CREATE TABLE `docenti_materie` (
+  `docente_id` int(11) NOT NULL,
+  `nome_materia` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dump dei dati per la tabella `docenti_materie`
+--
+
+INSERT INTO `docenti_materie` (`docente_id`, `nome_materia`) VALUES
+(1, 'Fisica'),
+(1, 'Matematica'),
+(2, 'Lingua e letteratura italiana'),
+(3, 'Lingua e letteratura italiana');
+
+-- --------------------------------------------------------
+
+--
 -- Struttura della tabella `materie`
 --
 
@@ -219,9 +262,37 @@ INSERT INTO `piani_studi` (`indirizzo`, `anno`, `codice_materia`, `ore_settimana
 ('Classico', 5, 'ITA', 4),
 ('Classico', 5, 'LAT', 4);
 
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `piani_studi_materie`
+--
+
+CREATE TABLE `piani_studi_materie` (
+  `indirizzo` varchar(100) NOT NULL,
+  `anno` int(11) NOT NULL,
+  `nome_materia` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dump dei dati per la tabella `piani_studi_materie`
+--
+
+INSERT INTO `piani_studi_materie` (`indirizzo`, `anno`, `nome_materia`) VALUES
+('Classico', 1, 'Lingua e cultura latina'),
+('Classico', 1, 'Lingua e letteratura italiana');
+
 --
 -- Indici per le tabelle scaricate
 --
+
+--
+-- Indici per le tabelle `cattedre`
+--
+ALTER TABLE `cattedre`
+  ADD PRIMARY KEY (`docente_id`,`nome_classe`,`nome_materia`),
+  ADD KEY `nome_classe` (`nome_classe`),
+  ADD KEY `nome_materia` (`nome_materia`);
 
 --
 -- Indici per le tabelle `classi`
@@ -237,6 +308,13 @@ ALTER TABLE `docenti`
   ADD KEY `sostituisce_id` (`sostituisce_id`);
 
 --
+-- Indici per le tabelle `docenti_materie`
+--
+ALTER TABLE `docenti_materie`
+  ADD PRIMARY KEY (`docente_id`,`nome_materia`),
+  ADD KEY `nome_materia` (`nome_materia`);
+
+--
 -- Indici per le tabelle `materie`
 --
 ALTER TABLE `materie`
@@ -247,6 +325,13 @@ ALTER TABLE `materie`
 --
 ALTER TABLE `piani_studi`
   ADD PRIMARY KEY (`indirizzo`,`anno`,`codice_materia`);
+
+--
+-- Indici per le tabelle `piani_studi_materie`
+--
+ALTER TABLE `piani_studi_materie`
+  ADD PRIMARY KEY (`indirizzo`,`anno`,`nome_materia`),
+  ADD KEY `nome_materia` (`nome_materia`);
 
 --
 -- AUTO_INCREMENT per le tabelle scaricate
@@ -263,10 +348,32 @@ ALTER TABLE `docenti`
 --
 
 --
+-- Limiti per la tabella `cattedre`
+--
+ALTER TABLE `cattedre`
+  ADD CONSTRAINT `cattedre_ibfk_1` FOREIGN KEY (`docente_id`) REFERENCES `docenti` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `cattedre_ibfk_2` FOREIGN KEY (`nome_classe`) REFERENCES `classi` (`nome_classe`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `cattedre_ibfk_3` FOREIGN KEY (`nome_materia`) REFERENCES `materie` (`nome_materia`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Limiti per la tabella `docenti`
 --
 ALTER TABLE `docenti`
   ADD CONSTRAINT `docenti_ibfk_1` FOREIGN KEY (`sostituisce_id`) REFERENCES `docenti` (`id`);
+
+--
+-- Limiti per la tabella `docenti_materie`
+--
+ALTER TABLE `docenti_materie`
+  ADD CONSTRAINT `docenti_materie_ibfk_1` FOREIGN KEY (`docente_id`) REFERENCES `docenti` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `docenti_materie_ibfk_2` FOREIGN KEY (`nome_materia`) REFERENCES `materie` (`nome_materia`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Limiti per la tabella `piani_studi_materie`
+--
+ALTER TABLE `piani_studi_materie`
+  ADD CONSTRAINT `piani_studi_materie_ibfk_1` FOREIGN KEY (`indirizzo`,`anno`) REFERENCES `piani_studi` (`indirizzo`, `anno`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `piani_studi_materie_ibfk_2` FOREIGN KEY (`nome_materia`) REFERENCES `materie` (`nome_materia`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
