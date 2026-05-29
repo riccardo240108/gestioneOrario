@@ -12,3 +12,5 @@ SET t1.ore_altro = t1.ore_contratto - t2.ore;
 
 
 SISTEMARE DB DA QUI, AGGIUNGERE ORE A PIANI DI STUDIO
+
+# sistemare conteggio ore_altro

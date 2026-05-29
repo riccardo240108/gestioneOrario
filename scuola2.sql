@@ -136,6 +136,7 @@ CREATE TABLE `docenti_materie` (
 
 INSERT INTO `docenti_materie` (`docente_id`, `nome_materia`, `ore`) VALUES
 (1, 'Lingua e cultura latina', 10),
+(1, 'Lingua e cultura latina', 10),
 (1, 'Lingua e letteratura italiana', 9),
 (2, 'Lingua e letteratura italiana', 14),
 (2, 'Storia e geografia', 11),
@@ -169,7 +170,7 @@ INSERT INTO `materie` (`nome_materia`, `codice_edt`) VALUES
 ('Disegno e storia dell\'arte', 'DIS'),
 ('Filosofia', 'FIL'),
 ('Fisica', 'FIS'),
-('Lingua e cultura greca', 'LCULTGRECA'),
+('Lingua e cultura greca', 'GRE'),
 ('Lingua e cultura latina', 'LAT'),
 ('Lingua e cultura straniera francese', 'FRA'),
 ('Lingua e cultura straniera inglese', 'ING'),
