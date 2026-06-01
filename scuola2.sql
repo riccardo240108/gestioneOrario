@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Creato il: Mag 18, 2026 alle 16:44
+-- Creato il: Giu 01, 2026 alle 13:25
 -- Versione del server: 10.4.28-MariaDB
 -- Versione PHP: 8.2.4
 
@@ -20,6 +20,61 @@ SET time_zone = "+00:00";
 --
 -- Database: `scuola1`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `articolazioni`
+--
+
+CREATE TABLE `articolazioni` (
+  `id_articolazione` int(11) NOT NULL,
+  `nome_articolazione` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dump dei dati per la tabella `articolazioni`
+--
+
+INSERT INTO `articolazioni` (`id_articolazione`, `nome_articolazione`) VALUES
+(1, '4B-4E');
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `articolazioni_classi`
+--
+
+CREATE TABLE `articolazioni_classi` (
+  `id_articolazione` int(11) NOT NULL,
+  `nome_classe` varchar(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dump dei dati per la tabella `articolazioni_classi`
+--
+
+INSERT INTO `articolazioni_classi` (`id_articolazione`, `nome_classe`) VALUES
+(1, '4B'),
+(1, '4E');
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `articolazioni_materie`
+--
+
+CREATE TABLE `articolazioni_materie` (
+  `id_articolazione` int(11) NOT NULL,
+  `nome_materia` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dump dei dati per la tabella `articolazioni_materie`
+--
+
+INSERT INTO `articolazioni_materie` (`id_articolazione`, `nome_materia`) VALUES
+(1, 'Matematica');
 
 -- --------------------------------------------------------
 
@@ -136,7 +191,6 @@ CREATE TABLE `docenti_materie` (
 
 INSERT INTO `docenti_materie` (`docente_id`, `nome_materia`, `ore`) VALUES
 (1, 'Lingua e cultura latina', 10),
-(1, 'Lingua e cultura latina', 10),
 (1, 'Lingua e letteratura italiana', 9),
 (2, 'Lingua e letteratura italiana', 14),
 (2, 'Storia e geografia', 11),
@@ -224,6 +278,26 @@ INSERT INTO `piani_studi` (`indirizzo`, `anno`, `codice_materia`, `ore_settimana
 --
 
 --
+-- Indici per le tabelle `articolazioni`
+--
+ALTER TABLE `articolazioni`
+  ADD PRIMARY KEY (`id_articolazione`);
+
+--
+-- Indici per le tabelle `articolazioni_classi`
+--
+ALTER TABLE `articolazioni_classi`
+  ADD KEY `id_articolazione` (`id_articolazione`),
+  ADD KEY `nome_classe` (`nome_classe`);
+
+--
+-- Indici per le tabelle `articolazioni_materie`
+--
+ALTER TABLE `articolazioni_materie`
+  ADD PRIMARY KEY (`id_articolazione`,`nome_materia`),
+  ADD KEY `nome_materia` (`nome_materia`);
+
+--
 -- Indici per le tabelle `cattedre`
 --
 ALTER TABLE `cattedre`
@@ -268,6 +342,12 @@ ALTER TABLE `piani_studi`
 --
 
 --
+-- AUTO_INCREMENT per la tabella `articolazioni`
+--
+ALTER TABLE `articolazioni`
+  MODIFY `id_articolazione` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT per la tabella `docenti`
 --
 ALTER TABLE `docenti`
@@ -276,6 +356,20 @@ ALTER TABLE `docenti`
 --
 -- Limiti per le tabelle scaricate
 --
+
+--
+-- Limiti per la tabella `articolazioni_classi`
+--
+ALTER TABLE `articolazioni_classi`
+  ADD CONSTRAINT `articolazioni_classi_ibfk_1` FOREIGN KEY (`id_articolazione`) REFERENCES `articolazioni` (`id_articolazione`) ON DELETE CASCADE,
+  ADD CONSTRAINT `articolazioni_classi_ibfk_2` FOREIGN KEY (`nome_classe`) REFERENCES `classi` (`nome_classe`) ON DELETE CASCADE;
+
+--
+-- Limiti per la tabella `articolazioni_materie`
+--
+ALTER TABLE `articolazioni_materie`
+  ADD CONSTRAINT `articolazioni_materie_ibfk_1` FOREIGN KEY (`id_articolazione`) REFERENCES `articolazioni` (`id_articolazione`) ON DELETE CASCADE,
+  ADD CONSTRAINT `articolazioni_materie_ibfk_2` FOREIGN KEY (`nome_materia`) REFERENCES `materie` (`nome_materia`) ON DELETE CASCADE;
 
 --
 -- Limiti per la tabella `cattedre`
