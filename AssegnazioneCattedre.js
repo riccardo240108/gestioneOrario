@@ -1,150 +1,137 @@
-function calcolaAssegnazioneConArticolate(pianiStudio, anagrafica, orePerMateria, tabelleArticolate) {
+function calcolaAssegnazioneConArticolate(pianiStudio, anagrafica, orePerMateria, tabelleArticolate, classiRealiScuola) {
     const assegnazioniFinali = [];
     
-    // Estraiamo le 3 tabelle che hai menzionato
+    // Estrazione delle tabelle di aggregazione
     const { tabellaGruppi, tabellaComposizione, tabellaMaterie } = tabelleArticolate;
 
-    console.log("\n=================================================");
-    console.log("   AVVIO ALGORITMO CON GESTIONE ARTICOLATE       ");
-    console.log("=================================================\n");
+    console.log(`\n--- DEBUG ALGORITMO ---`);
+    console.log(`Classi reali ricevute dal DB: ${classiRealiScuola ? classiRealiScuola.length : 0}`);
+    console.log(`Piani di studio attivi: ${pianiStudio ? pianiStudio.length : 0}`);
 
-    // --- FASE 1: ASSEGNAZIONE DELLE CLASSI ARTICOLATE (Prioritaria per evitare conflitti) ---
-    console.log("--- Elaborazione Cattedre Articolate ---");
-    
-    tabellaGruppi.forEach(gruppo => {
-        const idClasseArticolata = gruppo.id_classe; // L'ID fittizio dell'articolazione
-        const nomeGruppo = gruppo.gruppo_classe;     // Es: "Gruppo 3A-3B"
+    // Pre-inizializzazione sicura delle ore residue per ogni docente per evitare 'undefined'
+    for (const id in anagrafica) {
+        const doc = anagrafica[id];
+        // Cerchiamo la proprietà delle ore contrattuali in modo flessibile
+        const oreIniziali = parseInt(doc.ore_contratto || doc.ore || doc.ore_totali || 18, 10);
+        // Usiamo una variabile separata 'ore_residue' per non distruggere i dati originali
+        if (doc.ore_residue === undefined) {
+            doc.ore_residue = oreIniziali;
+        }
+    }
 
-        // 1. Troviamo quali materie fa questo gruppo articolato (Dalla terza tabella)
-        const materieGruppo = tabellaMaterie.filter(m => m.id_classe === idClasseArticolata);
+    // --- FASE 1: ASSEGNAZIONE DELLE CLASSI ARTICOLATE ---
+    if (tabellaGruppi && Array.isArray(tabellaGruppi)) {
+        tabellaGruppi.forEach(gruppo => {
+            const idClasseArticolata = gruppo.id_classe; 
+            const nomeGruppo = gruppo.gruppo_classe;     
 
-        // 2. Troviamo quali classi reali sono coinvolte (Dalla seconda tabella) per i report
-        const classiCoinvolte = tabellaComposizione
-            .filter(c => c.id_classe === idClasseArticolata)
-            .map(c => c.nome_classe_singola)
-            .join(" + "); // Es: "3A + 3B"
+            const materieGruppo = tabellaMaterie.filter(m => m.id_classe === idClasseArticolata);
 
-        materieGruppo.forEach(materiaArticolata => {
-            const codiceMateria = materiaArticolata.nome_materia; // o codice_edt
-            const oreNecessarie = materiaArticolata.ore;
+            const classiCoinvolte = tabellaComposizione
+                .filter(c => c.id_classe === idClasseArticolata)
+                .map(c => c.nome_classe_singola)
+                .join(" + "); 
 
-            console.log(`Analisi articolata [${nomeGruppo}] (${classiCoinvolte}) per Materia: ${codiceMateria} (${oreNecessarie} ore)`);
+            materieGruppo.forEach(materiaArticolata => {
+                const codiceMateria = materiaArticolata.nome_materia; 
+                const oreNecessarie = materiaArticolata.ore || 1;
 
-            // Cerchiamo il docente abilitato con ore residue sufficienti
-            const candidati = orePerMateria[codiceMateria] || [];
-            let cattedraCoperta = false;
+                const candidati = orePerMateria[codiceMateria] || [];
 
-            for (let i = 0; i < candidati.length; i++) {
-                const docenteAnagrafica = anagrafica[candidati[i].docente.id];
+                for (let i = 0; i < candidati.length; i++) {
+                    const docenteId = candidati[i].docente ? candidati[i].docente.id : candidati[i].docente_id;
+                    const docenteAnagrafica = anagrafica[docenteId];
 
-                // Verifichiamo se ha ore nel contratto
-                if (docenteAnagrafica.ore_contratto >= oreNecessarie) {
-                    // Sottraiamo le ore (il docente lavora 1 volta sola per entrambe le classi riunite!)
-                    docenteAnagrafica.ore_contratto -= oreNecessarie;
+                    if (docenteAnagrafica && docenteAnagrafica.ore_residue >= oreNecessarie) {
+                        docenteAnagrafica.ore_residue -= oreNecessarie;
 
-                    // Registriamo l'assegnazione speciale
-                    assegnazioniFinali.push({
-                        docente_id: docenteAnagrafica.id,
-                        classe_target: nomeGruppo, // Specifichiamo il gruppo articolato
-                        classi_reali: classiCoinvolte,
-                        nome_materia: codiceMateria,
-                        ore_assegnate: oreNecessarie,
-                        tipo: 'ARTICOLATA'
-                    });
-
-                    console.log(`  ✅ [ARTICOLATA] Assegnato a: ${docenteAnagrafica.cognome} (Ore residue: ${docenteAnagrafica.ore_contratto})`);
-                    cattedraCoperta = true;
-                    break;
+                        assegnazioniFinali.push({
+                            docente_id: docenteId,
+                            classe_target: nomeGruppo, 
+                            classi_reali: classiCoinvolte,
+                            nome_materia: codiceMateria,
+                            ore_assegnate: oreNecessarie,
+                            tipo: 'ARTICOLATA'
+                        });
+                        break;
+                    }
                 }
-            }
-
-            if (!cattedraCoperta) {
-                console.log(`  ❌ ⚠ Impossibile coprire l'articolata di ${codiceMateria} per ${nomeGruppo}`);
-            }
+            });
         });
-    });
+    }
 
-    //
-// --- FASE 2: ASSEGNAZIONE DELLE CLASSI NORMALI SINGOLE ---
-    console.log("\n--- FASE 2: Inizio Elaborazione Cattedre Normali Singole ---");
+    // --- FASE 2: ASSEGNAZIONE DELLE CLASSI NORMALI SINGOLE ---
+    if (classiRealiScuola && Array.isArray(classiRealiScuola)) {
+        classiRealiScuola.forEach(classe => {
+            const nomeClasse = classe.nome_classe ? classe.nome_classe.trim() : "";   
+            const indirizzoClasse = classe.indirizzo ? classe.indirizzo.trim() : ""; 
+            
+            // Estrazione sicura del primo numero nel nome classe
+            const matchAnno = nomeClasse.match(/\d+/);
+            const annoCorso = matchAnno ? parseInt(matchAnno[0], 10) : null;
 
-    // 1. Scorriamo una per una tutte le classi reali dell'istituto (es. '1A', '1B', '1C'...)
-    classiRealiScuola.forEach(classe => {
-        const nomeClasse = classe.nome_classe;   // Es: "1A"
-        const indirizzoClasse = classe.indirizzo; // Es: "Scientifico_biennio_comune"
-        const annoCorso = parseInt(nomeClasse.substring(0, 1), 10); // Estrae l'anno (es: 1)
-
-        // 2. Troviamo il piano di studi associato a questa specifica classe per l'anno in corso
-        const materieDaCoprire = pianiStudio.filter(p => 
-            p.indirizzo === indirizzoClasse && p.anno === annoCorso
-        );
-
-        console.log(`\nStiamo coprendo la Classe ${nomeClasse} (${indirizzoClasse}) - Materie previste: ${materieDaCoprire.length}`);
-
-        // 3. Per ogni materia richiesta nel piano di studi di questa classe...
-        materieDaCoprire.forEach(piano => {
-            const codiceMateria = piano.codice_materia; // Es: "MAT" o "ITA"
-            const oreNecessarie = piano.ore_settimanali;
-
-            // CONTROLLO DI SICUREZZA: Verifichiamo se questa materia per questa classe 
-            // è già stata assorbita e coperta in un gruppo articolato durante la Fase 1.
-            const giaCopertaInArticolata = assegnazioniFinali.some(a => 
-                a.tipo === 'ARTICOLATA' && 
-                a.nome_materia === codiceMateria && 
-                a.classi_reali.includes(nomeClasse)
-            );
-
-            if (giaCopertaInArticolata) {
-                console.log(`  跳 Salto ${codiceMateria} per la classe ${nomeClasse}: già coperta dal gruppo articolato (Fase 1).`);
-                return; // Passa alla materia successiva
+            if (!annoCorso) {
+                console.log(`⚠️ Impossibile determinare l'anno per la classe: "${nomeClasse}"`);
+                return;
             }
 
-            console.log(`  -> Analisi Fabbisogno: ${codiceMateria} richiede ${oreNecessarie} ore`);
+            // Filtra i piani di studio. Tolleranza sulle stringhe (lowercase e pulizia spazi)
+            const materieDaCoprire = pianiStudio.filter(p => {
+                const indPiano = p.indirizzo.toLowerCase().replace(/_/g, ' ');
+                const indClasse = indirizzoClasse.toLowerCase().replace(/_/g, ' ');
+                // Riconosce il match se uno contiene l'altro (es. "Scientifico" contenuto in "Scientifico tradizionale")
+                return (indPiano.includes(indClasse) || indClasse.includes(indPiano)) && p.anno === annoCorso;
+            });
 
-            // 4. Cerchiamo i docenti abilitati a questa materia
-            const candidatiAbilitati = orePerMateria[codiceMateria] || [];
-            let cattedraAssegnata = false;
+            if (materieDaCoprire.length === 0) {
+                console.log(`⚠️ Nessuna materia nei Piani Studio per Classe: ${nomeClasse} (${indirizzoClasse}) Anno: ${annoCorso}`);
+            }
 
-            // 5. Cerchiamo il primo docente con ore contrattuali residue sufficienti
-            for (let i = 0; i < candidatiAbilitati.length; i++) {
-                // Recuperiamo il docente in tempo reale dall'anagrafica centrale per avere le ore aggiornate
-                const docenteId = candidatiAbilitati[i].docente.id;
-                const docenteAnagrafica = anagrafica[docenteId];
+            materieDaCoprire.forEach(piano => {
+                const codiceMateria = piano.codice_materia; 
+                const oreNecessarie = piano.ore_settimanali;
 
-                // Se le ore residue del contratto bastano a coprire la cattedra
-                if (docenteAnagrafica.ore_contratto >= oreNecessarie) {
-                    
-                    // Sottraiamo le ore dal contratto del docente
-                    docenteAnagrafica.ore_contratto -= oreNecessarie;
+                // Controllo se già assorbita dall'articolata
+                const giaCopertaInArticolata = assegnazioniFinali.some(a => 
+                    a.tipo === 'ARTICOLATA' && 
+                    a.nome_materia === codiceMateria && 
+                    a.classi_reali && a.classi_reali.includes(nomeClasse)
+                );
 
-                    // Registriamo la cattedra standard (struttura corrispondente al tuo DB MySQL)
-                    assegnazioniFinali.push({
-                        docente_id: docenteAnagrafica.id,
-                        cognome: docenteAnagrafica.cognome,
-                        nome: docenteAnagrafica.nome,
-                        nome_classe: nomeClasse,
-                        nome_materia: codiceMateria, // Diventerà la stringa/codice nel DB
-                        ore_assegnate: oreNecessarie,
-                        tipo: 'NORMALE'
-                    });
+                if (giaCopertaInArticolata) return; 
 
-                    console.log(`    ✅ Assegnato: [ID: ${docenteAnagrafica.id}] ${docenteAnagrafica.cognome} ${docenteAnagrafica.nome} (Ore rimaste: ${docenteAnagrafica.ore_contratto})`);
-                    cattedraAssegnata = true;
-                    break; // Cattedra coperta! Usciamo dal ciclo dei docenti per questa materia
+                const candidatiAbilitati = orePerMateria[codiceMateria] || [];
+                let assegnata = false;
+
+                for (let i = 0; i < candidatiAbilitati.length; i++) {
+                    const docenteId = candidatiAbilitati[i].docente ? candidatiAbilitati[i].docente.id : candidatiAbilitati[i].docente_id;
+                    const docenteAnagrafica = anagrafica[docenteId];
+
+                    if (docenteAnagrafica && docenteAnagrafica.ore_residue >= oreNecessarie) {
+                        docenteAnagrafica.ore_residue -= oreNecessarie;
+
+                        assegnazioniFinali.push({
+                            docente_id: docenteId,
+                            cognome: docenteAnagrafica.cognome || 'Docente',
+                            nome: docenteAnagrafica.nome || `ID ${docenteId}`,
+                            nome_classe: nomeClasse,
+                            nome_materia: codiceMateria, 
+                            ore_assegnate: oreNecessarie,
+                            tipo: 'NORMALE'
+                        });
+                        assegnata = true;
+                        break; 
+                    }
                 }
-            }
 
-            if (!cattedraAssegnata) {
-                console.log(`    ❌ ⚠ ALLARME: Nessun docente ha abbastanza ore residue per coprire ${codiceMateria} in ${nomeClasse}!`);
-            }
+                if (!assegnata) {
+                    console.log(`❌ Nessun docente con ore sufficienti per ${codiceMateria} nella classe ${nomeClasse}`);
+                }
+            });
         });
-    });
-
-    console.log("\n=================================================");
-    console.log("          ELABORAZIONE COMPLETA TERMINATA       ");
-    console.log("=================================================\n");
+    }
 
     return assegnazioniFinali;
 }
 
-module.exports = { calcolaAssegnazioneCompleta };
+module.exports = { calcolaAssegnazioneConArticolate };
