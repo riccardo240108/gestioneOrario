@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Gestionale Cattedre</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; }
+    </style>
+</head>
+<body class="p-6">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+        
+        <header class="bg-blue-600 text-white p-6 rounded-2xl shadow-md text-center">
+            <h1 class="text-3xl font-bold">📊 SISTEMA GESTIONALE CATTEDRE</h1>
+            <p class="text-blue-100 mt-2">Visualizzazione Ore e Allocazione Interattiva Posti d'Insegnamento</p>
+        </header>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-blue-500">
+                <h3 class="text-lg font-bold text-gray-700 mb-4">📈 Conteggio Ore (Preventivo)</h3>
+                <div class="space-y-2 text-sm text-gray-600">
+                    <p>Totale Ore Contrattuali: <span id="rep-tot-contratto" class="font-semibold text-gray-900">0</span> h</p>
+                    <p>Totale Ore Destinate ad Altro: <span id="rep-tot-altro" class="font-semibold text-gray-900">0</span> h</p>
+                    <p class="pt-2 border-t font-medium text-blue-600">Ore Nette Disponibili: <span id="rep-ore-nette">0</span> h</p>
+                    <p>Ore Richieste dai Piani di Studio: <span id="rep-ore-piani" class="font-semibold text-gray-900">0</span> h</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-emerald-500">
+                <h3 class="text-lg font-bold text-gray-700 mb-4">⚖️ Bilancio di Copertura Totale</h3>
+                <div id="box-bilancio" class="p-4 rounded-xl text-sm font-medium text-center">
+                    Calcolo in corso...
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow border-t-4 border-purple-500 max-h-[170px] overflow-y-auto">
+                <h3 class="text-lg font-bold text-gray-700 mb-2">🏃‍♂️ Riepilogo 'Ore Altro'</h3>
+                <ul id="lista-ore-altro" class="text-xs text-gray-600 space-y-1 divide-y divide-gray-100">
+                </ul>
+            </div>
+        </section>
+
+        <section class="bg-white p-6 rounded-2xl shadow">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">🔍 Analisi Copertura Reale delle Materie</h3>
+            <div id="griglia-materie" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            </div>
+        </section>
+
+        <section class="bg-slate-800 text-white p-6 rounded-2xl shadow-xl">
+            <h3 class="text-xl font-bold text-amber-400 mb-4">✍️ Nuova Assegnazione Cattedra</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Tipo Classe</label>
+                    <select id="input-tipo" onchange="aggiornaTarget()" class="w-full bg-slate-700 text-white rounded-lg p-2.5 border border-slate-600 focus:outline-none focus:border-amber-400">
+                        <option value="1">Classe Normale (Singola)</option>
+                        <option value="2">Gruppo Articolato</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Classe Target</label>
+                    <select id="input-classe" onchange="caricaMaterieDisponibili()" class="w-full bg-slate-700 text-white rounded-lg p-2.5 border border-slate-600 focus:outline-none focus:border-amber-400">
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Materia</label>
+                    <select id="input-materia" onchange="filtraDocentiAbilitati()" class="w-full bg-slate-700 text-white rounded-lg p-2.5 border border-slate-600 focus:outline-none focus:border-amber-400">
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Ore Settimanali</label>
+                    <input type="number" id="input-ore" oninput="filtraDocentiAbilitati()" min="1" value="4" class="w-full bg-slate-700 text-white rounded-lg p-2 border border-slate-600 focus:outline-none focus:border-amber-400">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end mt-4">
+                <div class="md:col-span-3">
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Docente Disponibile con Ore Sufficienti</label>
+                    <select id="input-docente" class="w-full bg-slate-700 text-white rounded-lg p-2.5 border border-slate-600 focus:outline-none focus:border-amber-400">
+                    </select>
+                </div>
+
+                <div>
+                    <button onclick="registraCattedra()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold p-2.5 rounded-lg shadow transition duration-200">
+                        🚀 Registra Cattedra
+                    </button>
+                </div>
+            </div>
+            
+            <div id="notifica-successo" class="hidden mt-4 p-3 bg-emerald-600 text-white text-sm rounded-lg text-center font-medium">
+                ✅ Cattedra registrata con successo e report aggiornati nel database!
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000'; // Porta del server backend Node.js
+        
+        let anagraficaDocenti = {};
+        let mappaCodiciMaterie = {};
+        let cattedreAssegnate = [];
+        let classiDisponibili = [];
+        let articolazioniDisponibili = [];
+        let articolazioniMaterie = {};
+        
+        const oreRichiestePiani = { 
+            'Lingua e letteratura italiana': 16,
+            'Storia e geografia': 12,
+            'Matematica': 16,
+            "Disegno e storia dell'arte": 8
+        };
+        const totaleOrePiani = Object.values(oreRichiestePiani).reduce((a, b) => a + b, 0);
+
+        // --- CARICAMENTO DATI REALI DAL BACKEND ---
+        async function caricaDatiDalServer() {
+            try {
+                const risposta = await fetch(`${API_URL}/api/dati-iniziali`);
+                if (!risposta.ok) throw new Error("Errore risposta server");
+                
+                const dati = await risposta.json();
+                
+                anagraficaDocenti = dati.docenti || {};
+                mappaCodiciMaterie = dati.mappaCodici || {};
+                cattedreAssegnate = dati.cattedre || [];
+                classiDisponibili = dati.classi || [];
+                articolazioniDisponibili = dati.articolazioni || [];
+                articolazioniMaterie = dati.articolazioniMaterie || {};
+
+                renderizzaReportEStato();
+                aggiornaTarget();
+            } catch (errore) {
+                console.error("❌ Errore durante il recupero dei dati dal server Node.js:", errore);
+                alert("Impossibile connettersi al backend su port 3000. Assicurati che node server.js sia in esecuzione.");
+            }
+        }
+
+        function renderizzaReportEStato() {
+            let totaleOreDocenti = 0;
+            let totaleOreAltro = 0;
+            
+            document.getElementById("lista-ore-altro").innerHTML = "";
+            for (const id in anagraficaDocenti) {
+                const doc = anagraficaDocenti[id];
+                totaleOreDocenti += parseInt(doc.ore_contratto, 10) || 0;
+                totaleOreAltro += parseInt(doc.ore_altro, 10) || 0;
+
+                if (doc.ore_altro > 0) {
+                    const li = document.createElement("li");
+                    li.className = "py-1 flex justify-between";
+                    li.innerHTML = `<span>Prof. ${doc.cognome} ${doc.nome}</span> <span class="font-bold text-purple-600">${doc.ore_altro}h</span>`;
+                    document.getElementById("lista-ore-altro").appendChild(li);
+                }
+            }
+
+            const oreNetteDisponibili = totaleOreDocenti - totaleOreAltro;
+
+            document.getElementById("rep-tot-contratto").innerText = totaleOreDocenti;
+            document.getElementById("rep-tot-altro").innerText = totaleOreAltro;
+            document.getElementById("rep-ore-nette").innerText = oreNetteDisponibili;
+            document.getElementById("rep-ore-piani").innerText = totaleOrePiani;
+
+            const boxBilancio = document.getElementById("box-bilancio");
+            if (totaleOreDocenti >= totaleOrePiani) {
+                boxBilancio.className = "p-4 rounded-xl text-sm font-medium text-center bg-emerald-100 text-emerald-800";
+                boxBilancio.innerHTML = "✅ Bilancio Positivo!<br>Non ci sono ore aggiuntive da richiedere.";
+            } else {
+                boxBilancio.className = "p-4 rounded-xl text-sm font-medium text-center bg-amber-100 text-amber-800";
+                boxBilancio.innerHTML = `⚠️ Copertura Insufficiente!<br>È necessario richiedere ancora <b>${totaleOrePiani - totaleOreDocenti} ore</b>`;
+            }
+
+            const grigliaMaterie = document.getElementById("griglia-materie");
+            grigliaMaterie.innerHTML = "";
+
+            for (const materia in oreRichiestePiani) {
+                const oreNecessarie = oreRichiestePiani[materia];
+                const assegnazioni = cattedreAssegnate.filter(c => c.nome_materia === materia || mappaCodiciMaterie[materia] === c.nome_materia);
+                const oreCoperte = assegnazioni.reduce((sum, c) => sum + (parseInt(c.ore, 10) || 0), 0);
+                const isCoperta = oreCoperte >= oreNecessarie;
+
+                let listaDocentiHtml = "";
+                if (assegnazioni.length > 0) {
+                    assegnazioni.forEach(a => {
+                        const d = anagraficaDocenti[a.docente_id] || { cognome: a.cognome || "Docente", nome: a.nome || "" };
+                        listaDocentiHtml += `<p class="text-xs text-gray-500 mt-1">👤 Prof. ${d.cognome} (${a.nome_classe}) -> <b>${a.ore || 4}h</b></p>`;
+                    });
+                } else {
+                    listaDocentiHtml = `<p class="text-xs text-rose-500 italic mt-1">⚠ Nessun docente assegnato</p>`;
+                }
+
+                const card = document.createElement("div");
+                card.className = `p-4 rounded-xl shadow-sm border ${isCoperta ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/50 border-rose-200'}`;
+                card.innerHTML = `
+                    <h4 class="font-bold text-gray-800 text-sm truncate">${materia}</h4>
+                    <p class="text-xs text-gray-600 mt-1">Richieste: <b>${oreNecessarie}h</b> | Assegnate: <b>${oreCoperte}h</b></p>
+                    <div class="my-2 border-t border-gray-200/60 pt-1">${listaDocentiHtml}</div>
+                    <span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded-full ${isCoperta ? 'bg-emerald-200 text-emerald-800' : 'bg-rose-200 text-rose-800'}">
+                        ${isCoperta ? '✅ Coperta' : `❌ Scoperta (-${oreNecessarie - oreCoperte}h)`}
+                    </span>
+                `;
+                grigliaMaterie.appendChild(card);
+            }
+        }
+
+        function aggiornaTarget() {
+            const tipo = document.getElementById("input-tipo").value;
+            const inputClasse = document.getElementById("input-classe");
+            const inputOre = document.getElementById("input-ore");
+            inputClasse.innerHTML = "";
+
+            if (tipo === "1") {
+                const classi = classiDisponibili.length > 0 ? classiDisponibili : ['1A', '1B', '3B', '4B', '4E'];
+                classi.forEach(c => inputClasse.innerHTML += `<option value="${c}">${c.startsWith('Classe') ? c : 'Classe ' + c}</option>`);
+                inputOre.disabled = false;
+                inputOre.value = 4;
+                inputOre.className = "w-full bg-slate-700 text-white rounded-lg p-2 border border-slate-600 focus:outline-none focus:border-amber-400";
+            } else {
+                const gruppi = articolazioniDisponibili.length > 0 ? articolazioniDisponibili : [{id_classe: 1, gruppo_classe: "4B-4E"}];
+                gruppi.forEach(g => {
+                    inputClasse.innerHTML += `<option value="${g.gruppo_classe}" data-id="${g.id_classe}">${g.gruppo_classe} (ID: ${g.id_classe})</option>`;
+                });
+                inputOre.value = 1;
+                inputOre.disabled = true;
+                inputOre.className = "w-full bg-slate-800 text-gray-500 rounded-lg p-2 border border-slate-700 cursor-not-allowed";
+            }
+            caricaMaterieDisponibili();
+        }
+
+        function caricaMaterieDisponibili() {
+            const tipo = document.getElementById("input-tipo").value;
+            const inputMateria = document.getElementById("input-materia");
+            inputMateria.innerHTML = "";
+
+            if (tipo === "1") {
+                Object.keys(oreRichiestePiani).forEach(m => {
+                    inputMateria.innerHTML += `<option value="${m}">${m}</option>`;
+                });
+            } else {
+                const classeSelezionata = document.getElementById("input-classe");
+                const optionScelta = classeSelezionata.options[classeSelezionata.selectedIndex];
+                const idArticolazione = optionScelta ? optionScelta.getAttribute('data-id') : "1";
+                
+                const materieArticolate = articolazioniMaterie[idArticolazione] || ["Matematica"];
+                materieArticolate.forEach(mat => {
+                    inputMateria.innerHTML += `<option value="${mat}">${mat} (1 ora prevista)</option>`;
+                });
+            }
+            filtraDocentiAbilitati();
+        }
+
+        function filtraDocentiAbilitati() {
+            const oreRichieste = parseInt(document.getElementById("input-ore").value, 10) || 1;
+            const inputDocente = document.getElementById("input-docente");
+            inputDocente.innerHTML = "";
+
+            let docentiTrovati = false;
+            for (const id in anagraficaDocenti) {
+                const d = anagraficaDocenti[id];
+                if (parseInt(d.ore_contratto, 10) >= oreRichieste) {
+                    docentiTrovati = true;
+                    inputDocente.innerHTML += `<option value="${d.id}">Prof. ${d.cognome} ${d.nome} (Ore residue: ${d.ore_contratto}h)</option>`;
+                }
+            }
+
+            if (!docentiTrovati) {
+                inputDocente.innerHTML = `<option value="">❌ Nessun docente ha almeno ${oreRichieste}h libere!</option>`;
+            }
+        }
+
+        async function registraCattedra() {
+            const docenteId = document.getElementById("input-docente").value;
+            const classeTarget = document.getElementById("input-classe").value;
+            const materiaScelta = document.getElementById("input-materia").value;
+            const oreCattedra = parseInt(document.getElementById("input-ore").value, 10) || 0;
+
+            if (!docenteId) {
+                alert("Impossibile procedere: Selezionare un docente idoneo.");
+                return;
+            }
+
+            const payload = {
+                docente_id: parseInt(docenteId, 10),
+                nome_classe: classeTarget,
+                nome_materia: materiaScelta,
+                ore: oreCattedra
+            };
+
+            try {
+                const risposta = await fetch(`${API_URL}/api/assegna-cattedra`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (risposta.ok) {
+                    const notifica = document.getElementById("notifica-successo");
+                    notifica.classList.remove("hidden");
+                    setTimeout(() => notifica.classList.add("hidden"), 3500);
+
+                    await caricaDatiDalServer();
+                } else {
+                    const erroreServer = await risposta.json();
+                    alert("❌ Errore del server: " + erroreServer.message);
+                }
+            } catch (errore) {
+                console.error("❌ Errore di rete:", errore);
+                alert("Errore di connessione durante il salvataggio.");
+            }
+        }
+
+        window.onload = function() {
+            caricaDatiDalServer();
+        };
+    </script>
+</body>
+</html>
